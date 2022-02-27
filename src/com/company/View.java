@@ -2,8 +2,11 @@ package com.company;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Observable;
-import java.util.Observer;
+import java.io.Serializable;
+import java.util.*;
+import java.util.List;
+
+import static java.util.Arrays.*;
 
 
 public class View implements Observer {
@@ -12,6 +15,7 @@ public class View implements Observer {
     private JFrame frame;
     private JPanel panel;
     private static String word =  "";
+    private static List<Color> printlist = (List<Color>) (Color.TRANSLUCENT, Color.orange, Color.green); //reset, out, in
     private static JFrame f=new JFrame();//creating instance of JFrame
 
 
@@ -33,22 +37,46 @@ public class View implements Observer {
         f.setVisible(true);//making the frame visible
     }
 
-    private static void displayword(){
-           int x =15;
-           int y = controller.getTurn();
-           for (char ch: word.toCharArray()) {
-               JButton b=new JButton(String.valueOf(ch));//creating instance of JButton
-               b.setBounds(x,y,50, 40);//x axis, y axis, width, height
-               b.addActionListener((ActionEvent e) -> {ButtonHandler(b.getText());});
-               f.add(b);//adding button in JFrame
-            }
-           f.repaint();
-           System.out.println(word);
+    private static void wordGuess(ArrayList<Integer> guesses){
+        String guess = word;
+        int x =15;
+        int y = controller.getTurn();
+        for (int i = 0; i < 5; i++) {
+            JLabel L = new JLabel(String.valueOf(word.charAt(i)));
+            L.setBounds(x,y,50, 40);
+            L.setBackground((Color) printlist.get(guesses.get(i)));
+            f.add(L);
+            x += 50;
+        }
+        f.repaint();
+        System.out.println(word);
     }
 
-    private static void Enter(){
+    private static void displayword(){
+        String guess = word;
+        int x =15;
+        int y = controller.getTurn();
+        for (int i = 0; i < word.length(); i++) {
+            JLabel L = new JLabel(String.valueOf(word.charAt(i)));
+            L.setBounds(x,y,50, 40);
+            f.add(L);
+            x += 50;
+        }
+        f.repaint();
+        System.out.println(word);
+    }
+
+    private static void Enter(JButton enter){
+        System.out.println("WORD ENTERED : " + word);
         if (word.length() == 5){
-            controller.Enter(word);
+            System.out.println("PASS WORD COUNT");
+            if (controller.Enter(word)){
+                System.out.println("PASS ENTER CHECK");
+                ArrayList<Integer> Guesses = controller.Calcturn(word);
+                wordGuess(Guesses);
+            } else {
+                enter.setBackground(Color.red);
+            }
         }
     }
 
@@ -61,7 +89,7 @@ public class View implements Observer {
 
     private static void ButtonHandler(String letter){
         if (word.length() < 5){
-            word = word + letter;
+            word = word + letter.toLowerCase();
             displayword();
         }
     }
@@ -73,7 +101,7 @@ public class View implements Observer {
         f.add(b);//adding button in JFrame
         JButton enter=new JButton("ENTER");//creating instance of JButton
         enter.setBounds(255,400,110, 40);//x axis, y axis, width, height
-        enter.addActionListener((ActionEvent e) -> {Enter();});
+        enter.addActionListener((ActionEvent e) -> {Enter(enter);});
         f.add(enter);//adding button in JFrame
     }
 

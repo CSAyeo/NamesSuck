@@ -7,9 +7,12 @@ import java.util.*;
 
 
 public class Model extends Observable {
+    /*
     public static final String Reset = "\u001B[0m";
-    public static final String OutPlace = "\u001B[43m";
+    public static final String OutPlace = "\u001B[0m";
     public static final String InPlace = "\u001B[42m";
+     */
+    private List<String> printlist = Arrays.asList("\u001B[0m", "\u001B[43m","\u001B[42m" ); //reset, out, in
     private static final String Solution_File = "src/com/company/common.txt";
     private static final String Guess_File = "src/com/company/words.txt";
     private static List<String> Solution;
@@ -65,50 +68,45 @@ public class Model extends Observable {
     }
 
 
-    private boolean wordaccept(String GuessInput){
+    public boolean wordaccept(String GuessInput){
+        System.out.println("WORD DETECTED : " + GuessInput);
+        System.out.println("LOGIC" + (Guess.contains(GuessInput)));
+        System.out.println(Guess);
         if (Guess.contains(GuessInput)) {
             this.gameflag += 1;
             UserGuess = GuessInput;
             return true;
-        } else {
-            System.out.println("Word not recognised");
         }
-        return false;
+            return false;
     }
 
-    public String calcTurn(String UserGuess) {
+    public ArrayList<Integer> calcTurn(String UserGuess) {
         int cpos = 0;
-        String res = "";
+        ArrayList<Integer> res = new ArrayList<Integer>();
         if (UserGuess.equals(this.Answer)) {
             this.winflag = true;
-            System.out.println(Reset + "YOU WON!");
+            System.out.println(printlist.get(0) + "YOU WON!");
         }
 
         for (char letter : UserGuess.toCharArray()){
-            res = res + letterlogic(letter, cpos);
+            res.add(letterlogic(letter, cpos));
             cpos++;
         }
         return res;
     }
 
     // The following are only for CLI - can be safely moved to different class if needed
-    private void CLIPrint(int res) {
-        for (int i = 0; i < 5; i++) {
-            switch (res) {
-                case 2:
-                    System.out.print(InPlace + UserGuess.charAt(i));
-                    break;
-                case 1:
-                    System.out.print(OutPlace + UserGuess.charAt(i));
-                    break;
-                case 0:
-                    System.out.print(Reset + UserGuess.charAt(i));
-                    break;
-                default:
-                    System.out.println("BROKEN========================================: " + res);
-            }
-            System.out.print(Reset);
-        }
+    public void CLIPrint(ArrayList<Integer> res) {
+        int cpos = 0;
+       for (int i : res){
+           System.out.print(printlist.get(i) + UserGuess.charAt(cpos));
+           cpos++;
+       }
+        System.out.println(printlist.get(0));
+       if (gameflag > 6){
+           winflag = true;
+           System.out.println("Game over! Guess limit of 6 reached.\nThe word was : " + this.getAnswer());
+       }
     }
     public String TakeGuess() {
         boolean flag = false;

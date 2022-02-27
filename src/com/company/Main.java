@@ -30,7 +30,7 @@ public class Main {
     }
     static void CLIGame(Model model) {
         while (!model.winflag) {
-            model.calcTurn(model.TakeGuess());
+           model.CLIPrint(model.calcTurn(model.TakeGuess()));
         }
     }
     static void GUIGame(Model model){
