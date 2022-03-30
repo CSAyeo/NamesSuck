@@ -19,8 +19,12 @@ public class Model extends Observable {
     private static List<String> Guess;
     private String Answer;
     private int gameflag;
+    private boolean spoilerflag;
+    private boolean randomflag= true;
     private String UserGuess = null;
     public boolean winflag;
+    private ArrayList<String> Inplace = new ArrayList<String>();
+    private ArrayList<String> Outplace =new ArrayList<String>();
 
     String text = "";
     public void Enter(String text){
@@ -33,10 +37,28 @@ public class Model extends Observable {
 
     public int getTurn(){return gameflag;}
 
+    public boolean getWin(){return winflag;}
+
+    public void setflags(int spf, int rndf){
+        if (spf == 2){
+            spoilerflag=true;
+        }
+        if (rndf==2){
+            randomflag = false;
+        }
+    }
+
     public void setAnswer() {
         Random rand = new Random();
-        this.Answer = Solution.get(rand.nextInt(Solution.size()));
+        if (randomflag) {
+            this.Answer = Solution.get(rand.nextInt(Solution.size()));
+        }
+        else{this.Answer=Solution.get(0);};
         this.gameflag = 0;
+        this.winflag = false;
+        if (spoilerflag) {
+            System.out.println(this.Answer);
+        }
     }
 
     public void initalise() throws IOException {
@@ -57,10 +79,21 @@ public class Model extends Observable {
         gr.close();
     }
 
+
+    //FIX ME
     private Integer letterlogic(char letter, int pos) {
-        if (letter == this.Answer.charAt(pos)) {
+        if (letter == this.Answer.charAt(pos)){
+            if (!Inplace.contains(String.valueOf(letter))) {
+                Inplace.add(String.valueOf(letter));
+            }
+            if(Outplace.contains(String.valueOf(letter))){
+                Outplace.remove(new String(String.valueOf((letter))));
+            }
             return 2;
-        } else if (this.Answer.indexOf(letter) != -1) {
+        } else if (this.Answer.indexOf(letter) != -1){
+            if ((!Inplace.contains(String.valueOf(letter))) && (!Outplace.contains(String.valueOf(letter)))){
+            Outplace.add(String.valueOf(letter));
+        }
             return 1;
         } else {
             return 0;
@@ -68,17 +101,15 @@ public class Model extends Observable {
     }
 
 
-    public boolean wordaccept(String GuessInput){
-        System.out.println("WORD DETECTED : " + GuessInput);
-        System.out.println("LOGIC" + (Guess.contains(GuessInput)));
-        System.out.println(Guess);
+    public void wordaccept(String GuessInput){
         if (Guess.contains(GuessInput)) {
             this.gameflag += 1;
             UserGuess = GuessInput;
-            return true;
+            setChanged();
+            notifyObservers();
         }
-            return false;
     }
+
 
     public ArrayList<Integer> calcTurn(String UserGuess) {
         int cpos = 0;
@@ -94,29 +125,52 @@ public class Model extends Observable {
         }
         return res;
     }
+    
+    public ArrayList<String> getInplace(){
+        return (Inplace);
+    }
+
+
+    public ArrayList<String> getOutPlace(){
+        return (Outplace);
+    }
+
+
 
     // The following are only for CLI - can be safely moved to different class if needed
+
+    private void output(){
+        System.out.println("Inplace: " + this.Inplace);
+        System.out.println("Out of place: " + this.Outplace);
+    }
+
     public void CLIPrint(ArrayList<Integer> res) {
         int cpos = 0;
-       for (int i : res){
-           System.out.print(printlist.get(i) + UserGuess.charAt(cpos));
-           cpos++;
-       }
+        for (int i : res){
+            System.out.print(printlist.get(i) + UserGuess.charAt(cpos));
+            cpos++;
+        }
         System.out.println(printlist.get(0));
-       if (gameflag > 6){
-           winflag = true;
-           System.out.println("Game over! Guess limit of 6 reached.\nThe word was : " + this.getAnswer());
-       }
+        output();
+        if (gameflag > 6){
+            winflag = true;
+            System.out.println("Game over! Guess limit of 6 reached.\nThe word was : " + this.getAnswer());
+        }
     }
     public String TakeGuess() {
-        boolean flag = false;
         Scanner Scan = new Scanner(System.in);  // Create a Scanner object
         String GuessInput = null;
-        while (!flag) {
-            System.out.println("\nEnter Guess");
+        System.out.println("\nEnter Guess");
+        GuessInput = Scan.nextLine().toLowerCase();
+        wordaccept(GuessInput);
+        while (UserGuess==null) {
+            System.out.println("Word not valid! \nEnter Guess");
             GuessInput = Scan.nextLine().toLowerCase();
-            flag = wordaccept(GuessInput);
+            wordaccept(GuessInput);
         }
         return GuessInput;
     }
 }
+
+//set changed
+//notifyobservers
