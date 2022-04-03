@@ -164,7 +164,6 @@ public class View implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        System.out.println(word=="");
         if (word !="") {
             int y = controller.getTurn() - 1;
             for (int i = 1; i < 6; i++) {
