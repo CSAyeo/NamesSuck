@@ -55,6 +55,8 @@ public class Model extends Observable {
         }
         else{this.Answer=Solution.get(0);};
         this.gameflag = 0;
+        this.Inplace.clear();
+        this.Outplace.clear();
         this.winflag = false;
         if (spoilerflag) {
             System.out.println(this.Answer);
