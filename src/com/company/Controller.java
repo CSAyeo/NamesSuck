@@ -1,5 +1,8 @@
 package com.company;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 public class Controller {
@@ -19,6 +22,22 @@ public class Controller {
 
     public boolean getWin(){return model.getWin();}
 
-    public void newGame(){model.setAnswer();}
+    public void newGame(){
+        view.clearWords();
+        if (!view.Keyboard[0].isEnabled()){
+            view.ToggleButtons();
+        }else{view.ClearButtons();}
+        model.setAnswer();
+    }
+
+
+    void EndHandler(){
+        if (getTurn()==1) {
+            view.addNewGame();
+        }
+        if (getTurn()>=6 || getWin()){
+            view.ToggleButtons();
+        }
+    }
 
 }
