@@ -5,6 +5,26 @@ import java.io.IOException;
 import java.io.FileReader;
 import java.util.*;
 
+class CLI{
+    public static void main(String[] args) throws IOException {
+        Model model = new Model();
+        model.initalise();
+        model.setAnswer();
+        CLIGame(model);
+    }
+
+    static void CLIGame(Model model) throws IOException {
+        while (!model.winflag) {
+            model.CLIPrint(model.calcTurn(model.TakeGuess()));
+        }
+        System.out.println("Enter 1 for a new game:");
+        Scanner scan = new Scanner(System.in);  // Create a Scanner object
+        int NewGame = scan.nextInt();
+        if (NewGame==1){
+            model.setAnswer();
+            CLIGame(model);}
+    }
+}
 
 public class Model extends Observable {
     /*
@@ -23,8 +43,14 @@ public class Model extends Observable {
     private boolean randomflag= true;
     private String UserGuess = null;
     public boolean winflag;
+    private final int guesslimit = 6;
     private ArrayList<String> Inplace = new ArrayList<String>();
     private ArrayList<String> Outplace =new ArrayList<String>();
+    private ArrayList<String> Noplace =new ArrayList<String>();
+    private ArrayList<String> Unplace =new ArrayList<String>();
+
+
+
 
     String text = "";
     public void Enter(String text){
@@ -39,14 +65,6 @@ public class Model extends Observable {
 
     public boolean getWin(){return winflag;}
 
-    public void setflags(int spf, int rndf){
-        if (spf == 2){
-            spoilerflag=true;
-        }
-        if (rndf==2){
-            randomflag = false;
-        }
-    }
 
     public void setAnswer() {
         Random rand = new Random();
@@ -82,7 +100,7 @@ public class Model extends Observable {
     }
 
 
-    //FIX ME
+    //FIX ME - Binary search and removal :)))
     private Integer letterlogic(char letter, int pos) {
         if (letter == this.Answer.charAt(pos)){
             if (!Inplace.contains(String.valueOf(letter))) {
@@ -104,6 +122,7 @@ public class Model extends Observable {
 
 
     public void wordaccept(String GuessInput){
+        UserGuess = null;
         if (Guess.contains(GuessInput)) {
             this.gameflag += 1;
             UserGuess = GuessInput;
@@ -154,9 +173,9 @@ public class Model extends Observable {
         }
         System.out.println(printlist.get(0));
         output();
-        if (gameflag > 6){
+        if (gameflag > guesslimit){
             winflag = true;
-            System.out.println("Game over! Guess limit of 6 reached.\nThe word was : " + this.getAnswer());
+            System.out.println(("Game over! Guess limit of %d reached.\nThe word was : " + this.getAnswer()).formatted(guesslimit));
         }
     }
     public String TakeGuess() {

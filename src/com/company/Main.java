@@ -10,7 +10,6 @@ public class Main {
         int GameType = Decider("CLI", "GUI");
         Model model = new Model();
         model.initalise();
-        model.setflags(SpoilerFlag, FixedFlag);
         model.setAnswer();
         if (GameType == 1){
             CLIGame(model);

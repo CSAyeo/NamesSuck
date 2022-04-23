@@ -12,9 +12,9 @@ public class View implements Observer {
     private static String word =  "";
     private static List<Color> printlist = Arrays.asList(Color.gray, Color.orange, Color.green); //reset, out, in
     private static JFrame f=new JFrame();//creating instance of JFrame
-    private static JButton[] Keyboard = new JButton[26];
+    public static JButton[] Keyboard = new JButton[26];
     private static JLabel[][] DissGuess = new JLabel[6][7];
-    private static Color DefColour;
+    public Color DefColour;
 
 
     public View(Model model, Controller controller)  {
@@ -26,7 +26,7 @@ public class View implements Observer {
         update(model, null);
     }
 
-    public static void initGUI() {
+    public void initGUI() {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         InitKeyboard(f);
         additionalButtons(f);
@@ -76,7 +76,7 @@ public class View implements Observer {
         }
     }
 
-    private static void additionalButtons(JFrame f){
+    private void additionalButtons(JFrame f){
         JButton b=new JButton(String.valueOf((char)(171)));//creating instance of JButton
         b.setBounds(265,500,40, 40);//x axis, y axis, width, height
         b.setMargin(new Insets(0, 0, 0, 0));
@@ -114,18 +114,8 @@ public class View implements Observer {
         }
     }
 
-    private static void ToggleButtons(){
-        for(JButton k : Keyboard){
-            k.setBackground(DefColour);
-            k.setEnabled(!k.isEnabled());
-        }
-    }
-    private static void ClearButtons(){
-        for(JButton k : Keyboard){
-            k.setBackground(DefColour);
-        }
-    }
-    private static void clearWords() {
+
+    static void clearWords() {
         word = "";
         for (JLabel[] j : DissGuess) {
             for (JLabel k : j) {
@@ -136,32 +126,36 @@ public class View implements Observer {
         }
     }
 
-    private static void NewGame(JButton b) {
+    void addNewGame(){
+        JButton b = new JButton("New Game");//creating instance of JButton
+        b.setMargin(new Insets(0, 0, 0, 0));
+        b.setBounds(15, 300, 340, 30);//x axis, y axis, width, height
+        b.addActionListener((ActionEvent e) -> {
+            NewGame(b);
+        });
+        f.add(b);
+        f.repaint();
+    }
+
+    static void NewGame(JButton b) {
         controller.newGame();
-        clearWords();
-        if (!Keyboard[0].isEnabled()){
-            ToggleButtons();
-        }else{ClearButtons();}
         f.remove(b);
         f.repaint();
     }
 
-    private static void EndHandler(){
-        if (controller.getTurn()==1) {
-            JButton b = new JButton("New Game");//creating instance of JButton
-            b.setMargin(new Insets(0, 0, 0, 0));
-            b.setBounds(15, 300, 340, 30);//x axis, y axis, width, height
-            b.addActionListener((ActionEvent e) -> {
-                NewGame(b);
-            });
-            f.add(b);
-            f.repaint();
+    void ToggleButtons(){
+        for(JButton k : Keyboard){
+            k.setBackground(DefColour);
+            k.setEnabled(!k.isEnabled());
         }
-        if (controller.getTurn()>=6 || controller.getWin()){
-            ToggleButtons();
+    }
+    void ClearButtons(){
+        for(JButton k : Keyboard){
+            k.setBackground(DefColour);
         }
     }
 
+    //Update is called when observer is triggered
     @Override
     public void update(Observable o, Object arg) {
         if (word !="") {
@@ -180,7 +174,7 @@ public class View implements Observer {
                 }
             }
             word = "";
-            EndHandler();
+            controller.EndHandler();
         }
     }
 }
