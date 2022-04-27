@@ -7,10 +7,11 @@ public class Main {
     public static void main(String[] args) throws IOException {
         int SpoilerFlag = Decider("Standard", "Spoiler");
         int FixedFlag = Decider("Random Word", "Fixed Word");
+        int GuessFlag = Decider("Strict", "Loose");
         int GameType = Decider("CLI", "GUI");
         Model model = new Model();
         model.initalise();
-        model.setAnswer();
+        model.setAnswer(); //Calls set answer to select a new answer
         if (GameType == 1){
             CLIGame(model);
         }else if (GameType ==2){
@@ -43,3 +44,16 @@ public class Main {
         View GUI = new View(model, controller);
     }
 }
+/*
+[Model|+forname: string;+surname: string;-password: string|login(user,pass)]
+[Observable|+setChanged(); +notifyObservers()]
+[<<Interface>>Observer|+addObserver()]
+
+
+[note: You can stick notes on diagrams too!],
+[Observable]^ [Model]
+[View] -> [Model]
+[Controller] -> [Model]
+[View] <-> [Controller]
+[Observer]^-.-[View]
+*/

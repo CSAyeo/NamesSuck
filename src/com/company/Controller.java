@@ -1,24 +1,24 @@
 package com.company;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
 public class Controller {
 
     private Model model;
     private View view;
+    private String word ="";
 
     public Controller(Model model) {this.model = model;}
 
     public void setView(View  view) {this.view = view;}
 
-    public void Enter(String text) {model.wordaccept(text.toLowerCase());}
+    public int getLimit() {return model.getLimit();}
+
+    public void Enter() {model.wordaccept(word.toLowerCase());}
 
     public ArrayList<Integer> Calcturn(String text) {return model.calcTurn(text.toLowerCase());}
 
-    public int getTurn(){return model.getTurn();    }
+    public int getTurn(){return model.getTurn();}
 
     public boolean getWin(){return model.getWin();}
 
@@ -39,5 +39,23 @@ public class Controller {
             view.ToggleButtons();
         }
     }
+     void addletter(String letter){
+        if (word.length() < 5){
+            word = word + letter;
 
+        }
+    }
+
+    void dropword(){
+        word = "";
+    }
+
+    void removeletter(){
+        assert word.length() >= 1;
+        word = word.substring(0, word.length() - 1);
+    }
+
+    String getword(){
+        return word;
+    }
 }
