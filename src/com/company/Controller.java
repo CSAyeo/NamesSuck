@@ -16,11 +16,12 @@ public class Controller {
 
     public void Enter() {model.wordaccept(word.toLowerCase());}
 
-    public ArrayList<Integer> Calcturn(String text) {return model.calcTurn(text.toLowerCase());}
+    public ArrayList<Integer> Calcturn() {return model.calcTurn();}
 
     public int getTurn(){return model.getTurn();}
 
     public boolean getWin(){return model.getWin();}
+
 
     public void newGame(){
         view.clearWords();
@@ -35,15 +36,12 @@ public class Controller {
         if (getTurn()==1) {
             view.addNewGame();
         }
-        if (getTurn()>=6 || getWin()){
+        if (getTurn()>= model.getLimit() || getWin()){
             view.ToggleButtons();
         }
     }
      void addletter(String letter){
-        if (word.length() < 5){
             word = word + letter;
-
-        }
     }
 
     void dropword(){
@@ -52,6 +50,7 @@ public class Controller {
 
     void removeletter(){
         assert word.length() >= 1;
+        //System.out.println("pre: %s \n post: %s".formatted(word, word.substring(0, word.length() - 1)));
         word = word.substring(0, word.length() - 1);
     }
 

@@ -7,9 +7,8 @@ import java.util.*;
 import java.util.List;
 
 
-
+//contains the main method for running from the view
 class GUI {
-
     public static void main(String[] args) throws IOException {//Main for a new CLI game
         Model model = new Model(); //initates a Model class, no controller or view required
         model.initalise(); //exectues model first run initalisation
@@ -25,7 +24,7 @@ class GUI {
 
 public class View implements Observer {
     private final Model model;
-    private static Controller controller = null;
+    private static Controller controller;
     private static List<Color> printlist = Arrays.asList(Color.gray, Color.orange, Color.green); //reset, out, in
     private static JFrame f=new JFrame();//creating instance of JFrame
     public static JButton[] Keyboard = new JButton[26];
@@ -34,6 +33,7 @@ public class View implements Observer {
 
 
     public View(Model model, Controller controller)  {
+        assert (model != null && controller !=null);
         this.model = model;
         model.addObserver(this);
         this.controller = controller;
@@ -43,10 +43,11 @@ public class View implements Observer {
     }
 
     public void initGUI() {
+        assert f!=null;
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         InitKeyboard(f);
         additionalButtons(f);
-        f.setSize(380,controller.getLimit()*100);//380 width and (number of guesses*100) height
+        f.setSize(380,(controller.getLimit()*100)+250);//380 width and (number of guesses*100) height
         f.setLayout(null);//using no layout managers
         f.setVisible(true);//making the frame visible
     }
@@ -85,20 +86,22 @@ public class View implements Observer {
 
     }
     private static void ButtonHandler(String letter){
-        controller.addletter(letter);
-        displayword();
+        if (controller.getword().length() < 5) {
+            controller.addletter(letter);
+            displayword();
+        }
     }
 
     private void additionalButtons(JFrame f){
         JButton b=new JButton(String.valueOf((char)(171)));//creating instance of JButton
-        b.setBounds(265,(controller.getLimit()*100)-100,40, 40);//x axis, y axis, width, height
+        b.setBounds(265,(controller.getLimit()*100)+150,40, 40);//x axis, y axis, width, height
         b.setMargin(new Insets(0, 0, 0, 0));
         b.addActionListener((ActionEvent e) -> {Backspace();});
         DefColour = b.getBackground();
         f.add(b);//adding button in JFrame
         JButton enter=new JButton(String.valueOf((char) 187));//creating instance of JButton
         enter.setMargin(new Insets(0, 0, 0, 0));
-        enter.setBounds(315,(controller.getLimit()*100)-100,40, 40);//x axis, y axis, width, height
+        enter.setBounds(315,(controller.getLimit()*100)+150,40, 40);//x axis, y axis, width, height
         enter.addActionListener((ActionEvent e) -> {Enter(enter);});
         f.add(enter);//adding button in JFrame
     }
@@ -108,8 +111,7 @@ public class View implements Observer {
         int xpos = 15;
         //f.getHeight isnt usable here as dynamic values can only be read after drawing is finished.
         // Rather than stop draw and resume or overwrite the method I chose to use guesslimit again
-        int ypos = (controller.getLimit()*100)-250;
-
+        int ypos = (controller.getLimit()*100);
         int c = 0;
         for(int i = 0; i < 26; i++){
             alpha = (char)(65 + i);
@@ -145,7 +147,7 @@ public class View implements Observer {
     void addNewGame(){
         JButton b = new JButton("New Game");//creating instance of JButton
         b.setMargin(new Insets(0, 0, 0, 0));
-        b.setBounds(15, (controller.getLimit()*100)-300, 340, 30);//x axis, y axis, width, height
+        b.setBounds(15, (controller.getLimit()*100)-50, 340, 30);//x axis, y axis, width, height
         b.addActionListener((ActionEvent e) -> {
             NewGame(b);
         });
@@ -178,7 +180,7 @@ public class View implements Observer {
             int y = controller.getTurn() - 1;
             for (int i = 1; i < 6; i++) {
                 try {
-                    int score = controller.Calcturn(controller.getword()).get(i - 1);
+                    int score = controller.Calcturn().get(i - 1);
                     Color scorecolour = printlist.get(score);
                     DissGuess[i][y].setBackground(scorecolour);
                     int charpos = (int) controller.getword().charAt(i - 1) - 65; //65

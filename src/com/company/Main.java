@@ -3,6 +3,8 @@ package com.company;
 import java.io.IOException;
 import java.util.Scanner;
 
+
+//this class only exists for testing and debugging purposes.
 public class Main {
     public static void main(String[] args) throws IOException {
         int SpoilerFlag = Decider("Standard", "Spoiler");
@@ -31,8 +33,9 @@ public class Main {
         return d;
     }
     static void CLIGame(Model model) throws IOException {
-        while (!model.winflag) {
-            model.CLIPrint(model.calcTurn(model.TakeGuess()));
+        while (!model.getGame()) {
+            model.TakeGuess();
+            model.CLIPrint(model.calcTurn());
         }
         int NewGame = Decider("New Game", "End Game");
         if (NewGame==1){
