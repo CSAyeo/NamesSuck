@@ -56,9 +56,7 @@ public class View implements Observer {
 
 
     private void Enter() { //triggered when enter is pressed
-        if (controller.getword().length() == 5) { //check the current word is 5 letters long
             controller.Enter();
-        }
     }
 
     private void Backspace(){
@@ -156,16 +154,16 @@ public class View implements Observer {
     }
 
     private void ButtonHandler(String letter){
-        if (controller.getword().length() < 5) {
+        if (controller.getwl() < 5) {
             controller.addletter(letter);
-            displayword();
+
         }
     }
 
     //functions
 
-    private void displayword(){ //display the letter entered, triggered after button press
-        int wl = controller.getword().length();
+    void displayword(){ //display the letter entered, triggered after button press
+        int wl = controller.getwl();
         int x =15 + (50 * wl-1);
         int y = controller.getTurn();
         DissGuess[wl][y] = new JLabel();

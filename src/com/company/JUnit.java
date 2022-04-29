@@ -1,9 +1,5 @@
 package com.company;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +11,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 //I'm assuming the board class allowed in the spec is referencing the view,
@@ -44,6 +42,7 @@ class JUnit {
     @RepeatedTest(5) //run the test 5 times for good coverage
     @DisplayName("No Place size reduction")
     void NoPlaceEmptiesTest() {
+        assertEquals(26, model.getUnplace().size());
         String data = model.randomGuess(); //select a random valid guess
         System.setIn(new ByteArrayInputStream(data.getBytes())); //imitate user entry using SetIn
         model.TakeGuess(); //take user guess
@@ -54,6 +53,7 @@ class JUnit {
     @Test
     @DisplayName("Final Turn Win")
     void GameWinConfirmedTest() {
+        assertFalse(model.winflag);
         for (int i =0; i < model.getLimit()-1; i++){ //use all but one attempts
             String data = model.randomGuess(); //select a random valid guess
             //if the guess is the answer, select a new one
