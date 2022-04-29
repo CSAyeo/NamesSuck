@@ -1,4 +1,5 @@
 package com.company;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -24,11 +25,11 @@ class GUI {
 
 public class View implements Observer {
     private final Model model;
-    private static Controller controller;
+    private Controller controller;
     private static List<Color> printlist = Arrays.asList(Color.gray, Color.orange, Color.green); //reset, out, in
-    private static JFrame f=new JFrame();//creating instance of JFrame
-    public static JButton[] Keyboard = new JButton[26];
-    private static JLabel[][] DissGuess = new JLabel[6][7];
+    private JFrame f=new JFrame();//creating instance of JFrame
+    public JButton[] Keyboard = new JButton[26];
+    private JLabel[][] DissGuess = new JLabel[6][7];
     public Color DefColour;
 
 
@@ -54,29 +55,13 @@ public class View implements Observer {
 
 
 
-    private static void displayword(){
-        int wl = controller.getword().length();
-        int x =15 + (50 * wl-1);
-        int y = controller.getTurn();
-        DissGuess[wl][y] = new JLabel();
-        DissGuess[wl][y].setOpaque(true);
-        DissGuess[wl][y].setHorizontalAlignment(SwingConstants.CENTER);
-        DissGuess[wl][y].setVerticalAlignment(SwingConstants.CENTER);
-        DissGuess[wl][y].setText(String.valueOf(controller.getword().charAt(wl-1)));
-        DissGuess[wl][y].setBounds(x,y*50,50, 40);
-        f.add(DissGuess[wl][y]);
-        f.repaint();
-    }
-
-
-
-    private static void Enter(JButton enter) {
-        if (controller.getword().length() == 5) {
+    private void Enter() { //triggered when enter is pressed
+        if (controller.getword().length() == 5) { //check the current word is 5 letters long
             controller.Enter();
         }
     }
 
-    private static void Backspace(){
+    private void Backspace(){
         int len = controller.getword().length();
         if (len>=1) {
             f.remove(DissGuess[len][controller.getTurn()]);
@@ -85,12 +70,7 @@ public class View implements Observer {
         }
 
     }
-    private static void ButtonHandler(String letter){
-        if (controller.getword().length() < 5) {
-            controller.addletter(letter);
-            displayword();
-        }
-    }
+
 
     private void additionalButtons(JFrame f){
         JButton b=new JButton(String.valueOf((char)(171)));//creating instance of JButton
@@ -102,19 +82,19 @@ public class View implements Observer {
         JButton enter=new JButton(String.valueOf((char) 187));//creating instance of JButton
         enter.setMargin(new Insets(0, 0, 0, 0));
         enter.setBounds(315,(controller.getLimit()*100)+150,40, 40);//x axis, y axis, width, height
-        enter.addActionListener((ActionEvent e) -> {Enter(enter);});
+        enter.addActionListener((ActionEvent e) -> {Enter();});
         f.add(enter);//adding button in JFrame
     }
 
-    private static void InitKeyboard(JFrame f){
+    private void InitKeyboard(JFrame f){
         char alpha;
         int xpos = 15;
         //f.getHeight isnt usable here as dynamic values can only be read after drawing is finished.
         // Rather than stop draw and resume or overwrite the method I chose to use guesslimit again
         int ypos = (controller.getLimit()*100);
         int c = 0;
-        for(int i = 0; i < 26; i++){
-            alpha = (char)(65 + i);
+        for(int i = 65; i < 91; i++){
+            alpha = (char)(i);
             JButton b=new JButton(String.valueOf(alpha));//creating instance of JButton
             b.setBounds(xpos,ypos,40, 40);//x axis, y axis, width, height
             b.addActionListener((ActionEvent e) -> {ButtonHandler(b.getText());});
@@ -133,7 +113,7 @@ public class View implements Observer {
     }
 
 
-    static void clearWords() {
+    public void clearWords() { //remove all the labels displaying current words
         controller.dropword();
         for (JLabel[] j : DissGuess) {
             for (JLabel k : j) {
@@ -148,20 +128,14 @@ public class View implements Observer {
         JButton b = new JButton("New Game");//creating instance of JButton
         b.setMargin(new Insets(0, 0, 0, 0));
         b.setBounds(15, (controller.getLimit()*100)-50, 340, 30);//x axis, y axis, width, height
-        b.addActionListener((ActionEvent e) -> {
-            NewGame(b);
+        b.addActionListener((ActionEvent e) -> {NewGame(b);
         });
         f.add(b);
         f.repaint();
     }
 
-    static void NewGame(JButton b) {
-        controller.newGame();
-        f.remove(b);
-        f.repaint();
-    }
 
-    void ToggleButtons(){
+    void ToggleButtons(){ //set the background to default (remove colour), and toggle button access
         for(JButton k : Keyboard){
             k.setBackground(DefColour);
             k.setEnabled(!k.isEnabled());
@@ -173,7 +147,38 @@ public class View implements Observer {
         }
     }
 
-    //Update is called when observer is triggered
+    //listeners
+
+    public void NewGame(JButton b) {
+        controller.newGame();
+        f.remove(b);
+        f.repaint();
+    }
+
+    private void ButtonHandler(String letter){
+        if (controller.getword().length() < 5) {
+            controller.addletter(letter);
+            displayword();
+        }
+    }
+
+    //functions
+
+    private void displayword(){ //display the letter entered, triggered after button press
+        int wl = controller.getword().length();
+        int x =15 + (50 * wl-1);
+        int y = controller.getTurn();
+        DissGuess[wl][y] = new JLabel();
+        DissGuess[wl][y].setOpaque(true);
+        DissGuess[wl][y].setHorizontalAlignment(SwingConstants.CENTER);
+        DissGuess[wl][y].setVerticalAlignment(SwingConstants.CENTER);
+        DissGuess[wl][y].setText(String.valueOf(controller.getword().charAt(wl-1)));
+        DissGuess[wl][y].setBounds(x,y*50,50, 40);
+        f.add(DissGuess[wl][y]);
+        f.repaint();
+    }
+
+    //Update is called when observer is triggered - submission of a complete matching word, colouring letter and keyboard
     @Override
     public void update(Observable o, Object arg) {
         if (controller.getword() !="") {

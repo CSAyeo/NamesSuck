@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.util.*;
 
 class CLI{
-
     public static void main(String[] args) throws IOException {//Main for a new CLI game
         Model model = new Model(); //initates a Model class, no controller or view required
         model.initalise(); //exectues model first run initalisation
@@ -15,7 +14,7 @@ class CLI{
     }
 
     static void CLIGame(Model model) throws IOException {
-        while (!model.getGame()) { //while the game isnt over
+        while (model.getGame()) { //while the game isnt over
             model.TakeGuess();
             model.CLIPrint(model.calcTurn());
         }
@@ -40,13 +39,13 @@ public class Model extends Observable {
     public boolean winflag;
     private String Answer;
     private int turncount;
-    private String UserGuess = null; //stores the user guess for processing
+    private String UserGuess = ""; //stores the user guess for processing
 
     //adjustable flags
-    private boolean spoilerflag = true; //print the spoiler? true - print, false -don't print
-    private boolean randomflag = true; //select a random word or fixed. true - 'cigar', false random word
-    private boolean validflag = false; // Allow entry of 5 letters not in wordlist. true - allow all, false - allow only valid
-    private final int guesslimit = 5; //sets the number of guesses allowed per game, GUI is dynamically resized
+    private final boolean spoilerflag = false; //print the spoiler? true - print, false -don't print
+    private final boolean randomflag = false; //select a random word or fixed. true - random, false 'cigar'
+    private final boolean validflag = true; // Allow entry of 5 letters not in wordlist. true - allow all, false - allow only valid
+    private final int guesslimit = 1; //sets the number of guesses allowed per game, GUI is dynamically resized
 
     //CLI Variables
     private List<String> printlist = Arrays.asList("\u001B[0m", "\u001B[43m", "\u001B[42m"); //reset, out, in, accessed by index from letterlogic
@@ -57,21 +56,21 @@ public class Model extends Observable {
 
     public void setAnswer() {
         Random rand = new Random();
-        if (randomflag) {
-            this.Answer = Solution.get(rand.nextInt(Solution.size()));
+        if (randomflag) { //if the flag is set to random (true)
+            this.Answer = Solution.get(rand.nextInt(Solution.size())); //get a random answer from the list
         } else {
-            this.Answer = Solution.get(0);
+            this.Answer = Solution.get(0); //otherwise select position 0 - 'cigar'
         }
-        ;
-        this.turncount = 0;
-        this.Inplace.clear();
+        this.turncount = 0; //reset the turns
+        this.Inplace.clear(); //reset all lists
         this.Outplace.clear();
         this.Noplace.clear();
         this.Unplace.clear();
-        for (int i = 0; i < 26; i++) {
-            Unplace.add(String.valueOf((char) (97 + i)));
+        for (int i = 97; i < 123; i++) { //set Unplaced to contain all valid letters
+            Unplace.add(String.valueOf((char) (i)));
         }
-        this.gameflag = false;
+        this.gameflag = true; //set the game to running
+        this.winflag = false;
         if (spoilerflag) {
             System.out.println(this.Answer);
         }
@@ -98,10 +97,10 @@ public class Model extends Observable {
     }
 
 
-    //FIX ME - Binary search and removal :)))
+    //Checks the letter against the answer
     private Integer letterlogic(char letter, int pos) {
         assert this.Answer != null;
-        if (letter == this.Answer.charAt(pos)) {
+        if (letter == this.Answer.charAt(pos)) { //perfect match, green
             if (!Inplace.contains(String.valueOf(letter))) {
                 Inplace.add(String.valueOf(letter));
             }
@@ -112,7 +111,7 @@ public class Model extends Observable {
                 Unplace.remove(new String(String.valueOf((letter))));
             }
             return 2;
-        } else if (this.Answer.indexOf(letter) != -1) {
+        } else if (this.Answer.indexOf(letter) != -1) { //letter features in word, but not location
             if ((!Inplace.contains(String.valueOf(letter))) && (!Outplace.contains(String.valueOf(letter)))) {
                 Outplace.add(String.valueOf(letter));
             }
@@ -120,7 +119,7 @@ public class Model extends Observable {
                 Unplace.remove(new String(String.valueOf((letter))));
             }
             return 1;
-        } else {
+        } else {//letter does not feature in word
             if (Unplace.contains(String.valueOf(letter))) {
                 Unplace.remove(new String(String.valueOf((letter))));
             }
@@ -129,18 +128,18 @@ public class Model extends Observable {
             }
             return 0;
         }
-
     }
 
-
+    //check that the word is an acceptable length, is a valid word and/or loose entry is allowed
     public void wordaccept(String GuessInput) {
-        UserGuess = null;
-        if (Guess.contains(GuessInput) || validflag) {
-            this.turncount += 1;
-            UserGuess = GuessInput;
-            setChanged();
-            notifyObservers();
-        }
+        if (GuessInput.length() == 5) {
+            if (Guess.contains(GuessInput) || validflag) { //if the guess is valid or flag is set to allow all 'words'
+                this.turncount += 1;
+                UserGuess = GuessInput;
+                setChanged();  //trigger an update to the view to set colours
+                notifyObservers();
+            }else{UserGuess = "";}
+        }else{UserGuess = "";}
     }
 
 
@@ -148,10 +147,9 @@ public class Model extends Observable {
         int cpos = 0;
         ArrayList<Integer> res = new ArrayList<Integer>();
         if (UserGuess.equals(this.Answer)) {
-            this.gameflag = true;
+            this.gameflag = false;
             this.winflag = true;
         }
-
         for (char letter : UserGuess.toCharArray()) {
             res.add(letterlogic(letter, cpos));
             //sort all the lists - a BST implementation would be preferable but this works for now
@@ -179,7 +177,7 @@ public class Model extends Observable {
     }
 
     public boolean getWin() {
-        return gameflag;
+        return winflag;
     }
 
     public int getLimit() {
@@ -193,7 +191,6 @@ public class Model extends Observable {
         System.out.println("Out of place: " + this.Outplace);
         System.out.println("No place (Wrong): " + this.Noplace);
         System.out.println("Unplaced: " + this.Unplace);
-
     }
 
     public void CLIPrint(ArrayList<Integer> res) {
@@ -204,8 +201,8 @@ public class Model extends Observable {
         }
         System.out.println(printlist.get(0));
         output();
-        if (turncount > guesslimit) {
-            gameflag = true;
+        if (turncount >= getLimit()) {
+            gameflag = false;
             System.out.println(("Game over! Guess limit of %d reached.\nThe word was : " + this.getAnswer()).formatted(guesslimit));
         }
     }
@@ -216,7 +213,7 @@ public class Model extends Observable {
         System.out.println("\nEnter Guess");
         GuessInput = Scan.nextLine().toLowerCase();
         wordaccept(GuessInput);
-        while (UserGuess == null) {
+        while (UserGuess == "") {
             System.out.println("Word not valid! \nEnter Guess");
             GuessInput = Scan.nextLine().toLowerCase();
             wordaccept(GuessInput);
@@ -225,9 +222,6 @@ public class Model extends Observable {
     }
 
     //Getters & Setters for testing
-    public void setUserGuess(String Guess) {
-        this.UserGuess = Guess;
-    }
 
     public ArrayList<String> getUnplace() {
         return Unplace;
@@ -236,6 +230,10 @@ public class Model extends Observable {
     public String randomGuess() {
         Random rand = new Random();
         return Solution.get(rand.nextInt(Solution.size()));
+    }
+
+    public boolean Invarient(){
+        return (this.getTurn() < guesslimit);
     }
 }
 
