@@ -42,10 +42,10 @@ public class Model extends Observable {
     private String UserGuess = ""; //stores the user guess for processing
 
     //adjustable flags
-    private final boolean spoilerflag = false; //print the spoiler? true - print, false -don't print
-    private final boolean randomflag = false; //select a random word or fixed. true - random, false 'cigar'
-    private final boolean validflag = true; // Allow entry of 5 letters not in wordlist. true - allow all, false - allow only valid
-    private final int guesslimit = 1; //sets the number of guesses allowed per game, GUI is dynamically resized
+    private final boolean spoilerflag = true; //print the spoiler? true - print, false -don't print
+    private final boolean randomflag = true; //select a random word or fixed. true - random, false 'cigar'
+    private final boolean validflag = false; // Allow entry of 5 letters not in wordlist. true - allow all, false - allow only valid
+    private final int guesslimit = 5; //sets the number of guesses allowed per game, GUI is dynamically resized
 
     //CLI Variables
     private List<String> printlist = Arrays.asList("\u001B[0m", "\u001B[43m", "\u001B[42m"); //reset, out, in, accessed by index from letterlogic
