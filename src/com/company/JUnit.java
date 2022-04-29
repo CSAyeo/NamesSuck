@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 
@@ -25,20 +26,25 @@ class JUnit {
 
 
     @BeforeEach //Before each was used to prevent reuisng the same model for each test,
-        // using up guesses and changing the four arrays
+                // using up guesses and changing the four arrays
     void initAll() throws IOException {//create and initialise the model for the tests
         this.model = new Model();
         model.initalise();
         model.setAnswer();
     }
-    @Test
-    void ValidAnswer() {
-        assertTrue(model.getAnswer().matches("[a-z]{5}"));//the answer is 5 members of the lowercase latin alphabet
+
+    @RepeatedTest(10)//repeat the test 10 times for good coverage
+    @DisplayName("Valid Answers Should be set")
+    void ValidAnswerTest() {
+        assertTrue(model.Invarient());
+        assertTrue(model.getAnswer().matches("[a-z]{5}"));//checks via regex that the answer is 5 members of the lowercase latin alphabet
     }
 
     //Test is unaffected if daisy is the correct answer,
     @RepeatedTest(5) //run the test 5 times for good coverage
-    void NoPlaceEmpties() {
+    @DisplayName("No Place size reduction")
+    void NoPlaceEmptiesTest() {
+        assertTrue(model.Invarient());
         String data = model.randomGuess(); //select a random valid guess
         System.setIn(new ByteArrayInputStream(data.getBytes())); //imitate user entry using SetIn
         model.TakeGuess(); //take user guess
@@ -47,7 +53,9 @@ class JUnit {
     }
 
     @Test
-    void GameWinConfirmed() {
+    @DisplayName("Final Turn Win")
+    void GameWinConfirmedTest() {
+        assertTrue(model.Invarient());
         for (int i =0; i < model.getLimit()-1; i++){ //use all but one attempts
             String data = model.randomGuess(); //select a random valid guess
             //if the guess is the answer, select a new one
