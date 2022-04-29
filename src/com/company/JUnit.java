@@ -31,12 +31,12 @@ class JUnit {
         this.model = new Model();
         model.initalise();
         model.setAnswer();
+        assertTrue(model.InvarientTurn());
     }
 
     @RepeatedTest(10)//repeat the test 10 times for good coverage
     @DisplayName("Valid Answers Should be set")
     void ValidAnswerTest() {
-        assertTrue(model.Invarient());
         assertTrue(model.getAnswer().matches("[a-z]{5}"));//checks via regex that the answer is 5 members of the lowercase latin alphabet
     }
 
@@ -44,7 +44,6 @@ class JUnit {
     @RepeatedTest(5) //run the test 5 times for good coverage
     @DisplayName("No Place size reduction")
     void NoPlaceEmptiesTest() {
-        assertTrue(model.Invarient());
         String data = model.randomGuess(); //select a random valid guess
         System.setIn(new ByteArrayInputStream(data.getBytes())); //imitate user entry using SetIn
         model.TakeGuess(); //take user guess
@@ -55,7 +54,6 @@ class JUnit {
     @Test
     @DisplayName("Final Turn Win")
     void GameWinConfirmedTest() {
-        assertTrue(model.Invarient());
         for (int i =0; i < model.getLimit()-1; i++){ //use all but one attempts
             String data = model.randomGuess(); //select a random valid guess
             //if the guess is the answer, select a new one

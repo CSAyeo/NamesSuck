@@ -54,6 +54,14 @@ public class Model extends Observable {
     private ArrayList<String> Noplace = new ArrayList<String>();
     private ArrayList<String> Unplace = new ArrayList<String>();
 
+    /*  Precondition:   none
+        Postcondition:  turncount < guesslimit
+                        Answer != null and Answer != ""
+                        Inplace = ∅
+                        Outplace = ∅
+                        Noplace = ∅
+                        Unplace = {a, b,c,d,e,f,....,z}
+     */
     public void setAnswer() {
         Random rand = new Random();
         if (randomflag) { //if the flag is set to random (true)
@@ -76,7 +84,12 @@ public class Model extends Observable {
         }
     }
 
-
+    /*  Precondition:   SolutionFile != null
+                        GuessFile != null
+        Postcondition:
+                        this.Solution !=null
+                        this.Guess != null
+     */
     public void initalise() throws IOException {
         this.Guess = new ArrayList<>();
         BufferedReader sl = new BufferedReader(new FileReader(Solution_File));
@@ -96,7 +109,12 @@ public class Model extends Observable {
         gr.close();
     }
 
-
+    /*  Precondition:   pos >= 0
+                        letter != "" & letter != null
+        Postcondition:
+                        letter ∉ Unplace
+                        letter ∈ Inplace xor letter ∈ Outplace xor letter ∈ Noplace
+     */
     //Checks the letter against the answer
     private Integer letterlogic(char letter, int pos) {
         assert this.Answer != null;
@@ -131,6 +149,9 @@ public class Model extends Observable {
     }
 
     //check that the word is an acceptable length, is a valid word and/or loose entry is allowed
+        /*  Precondition: GuessInput !=null
+        Postcondition: if GuessInput.length =5 & GuessInput ∈ Guess, view.update()
+     */
     public void wordaccept(String GuessInput) {
         if (GuessInput.length() == 5) {
             if (Guess.contains(GuessInput) || validflag) { //if the guess is valid or flag is set to allow all 'words'
@@ -142,7 +163,11 @@ public class Model extends Observable {
         }else{UserGuess = "";}
     }
 
+    /*  Precondition:   UserGuess != null
+                        this.Answer != null
+        Postcondition:  res.length() = 5
 
+     */
     public ArrayList<Integer> calcTurn() {
         int cpos = 0;
         ArrayList<Integer> res = new ArrayList<Integer>();
@@ -193,6 +218,9 @@ public class Model extends Observable {
         System.out.println("Unplaced: " + this.Unplace);
     }
 
+    /*  Precondition:   printlist != null
+        Postcondition:
+     */
     public void CLIPrint(ArrayList<Integer> res) {
         int cpos = 0;
         for (int i : res) {
@@ -206,6 +234,9 @@ public class Model extends Observable {
             System.out.println(("Game over! Guess limit of %d reached.\nThe word was : " + this.getAnswer()).formatted(guesslimit));
         }
     }
+    /*  Precondition: none
+        Postcondition: UserGuess != "" and UserGuess != null
+     */
 
     public String TakeGuess() {
         Scanner Scan = new Scanner(System.in);  // Create a Scanner object
@@ -223,16 +254,15 @@ public class Model extends Observable {
 
     //Getters & Setters for testing
 
-    public ArrayList<String> getUnplace() {
-        return Unplace;
-    }
+    public ArrayList<String> getUnplace() {return Unplace; }
 
     public String randomGuess() {
         Random rand = new Random();
         return Solution.get(rand.nextInt(Solution.size()));
     }
 
-    public boolean Invarient(){
+
+    public boolean InvarientTurn(){
         return (this.getTurn() < guesslimit);
     }
 }
